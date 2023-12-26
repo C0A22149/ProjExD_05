@@ -571,7 +571,7 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
-
+        
         if len(pg.sprite.spritecollide(bird,Goal,False)) != 0:
             bird.change_img(6, screen) # こうかとん嬉しいエフェクト
             score.update(screen)
