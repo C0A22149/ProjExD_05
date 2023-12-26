@@ -152,7 +152,7 @@ class Bomb(pg.sprite.Sprite):
         引数2 bird：攻撃対象のこうかとん
         """
         super().__init__()
-        self.image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/fire.png"), 0, 0.2)  #bombを火の玉に変更
+        self.image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/fire.png"), 0, 0.1)  #bombを火の玉に変更
         #rad = random.randint(10, 50)  # 爆弾円の半径：10以上50以下の乱数
         #color = random.choice(__class__.colors)  # 爆弾円の色：クラス変数からランダム選択
         #self.image = pg.Surface((2*rad, 2*rad))
@@ -545,7 +545,7 @@ class Skill1(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         # Load image and resize
-        self.image_path = "ex05/fig/beam.png"
+        self.image_path = "ex05/fig/a.jpg"
         self.original_image = pg.image.load(self.image_path)
         self.skill1_image = pg.transform.scale(self.original_image, (100, 100))
         self.skill1_rect = self.skill1_image.get_rect()
@@ -710,6 +710,7 @@ def main():
             bird.change_img(6, screen)  # こうかとん喜びエフェクト
              
         if pg.sprite.spritecollide(bird, coins, True): 
+             exp_bar.current_exp += 100
              score.value += 100     
 
         if len(pg.sprite.spritecollide(bird, ghosts, True)) != 0:
@@ -726,6 +727,10 @@ def main():
 
         for bomb in pg.sprite.groupcollide(bombs, beams, True, True).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+            score.value += 1  # 1点アップ
+
+        for ghost in pg.sprite.groupcollide(ghosts, skill1_group, True, False).keys():
+            exp_bar.current_exp += 30
             score.value += 1  # 1点アップ
 
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
@@ -774,7 +779,7 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
-
+        
         if len(pg.sprite.spritecollide(bird,Goal,False)) != 0:
             bird.change_img(6, screen) # こうかとん嬉しいエフェクト
             score.update(screen)
