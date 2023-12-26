@@ -26,9 +26,6 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
-# フォントの設定
-
-
 
 def check_bound(obj: pg.Rect) -> tuple[bool, bool]:
     """
@@ -392,7 +389,7 @@ class Score:
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         screen.blit(self.image, self.rect)
 
-        
+
 class Coin(pg.sprite.Sprite):
     """
     コインに関するクラス
@@ -405,7 +402,7 @@ class Coin(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
         pg.draw.circle(self.image, (255,255,0),(15,15), 15)  #半径15の黄色のコイン
         self.image.set_colorkey((0, 0, 0))
-        
+
     def update(self):
         """
         コインと消去の更新に関する関数
@@ -415,7 +412,7 @@ class Coin(pg.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
-            
+
 class Field(pg.sprite.Sprite):
     """
     足場に関するクラス
@@ -461,6 +458,7 @@ class ExperienceBar(pg.sprite.Sprite):
         exp_percentage = min(self.current_exp / self.max_exp, 1.0)
         pg.draw.rect(self.image, BLUE, (0, 0, 100 * exp_percentage, 20))
 
+
 class Level(pg.sprite.Sprite):
     """
     レベル
@@ -474,6 +472,7 @@ class Level(pg.sprite.Sprite):
 
     def update(self):
         self.image = self.font.render(f"Level: {self.level}", True, BLACK)
+
 
 class Skill(pg.sprite.Sprite):
     """
@@ -546,7 +545,7 @@ class Skill1(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         # Load image and resize
-        self.image_path = "ex04/fig/a.jpg"
+        self.image_path = "ex05/fig/beam.png"
         self.original_image = pg.image.load(self.image_path)
         self.skill1_image = pg.transform.scale(self.original_image, (100, 100))
         self.skill1_rect = self.skill1_image.get_rect()
@@ -566,6 +565,7 @@ class Skill1(pg.sprite.Sprite):
         self.rect.y += self.speed
         if self.rect.y > HEIGHT:
             self.kill()
+
 
 class Hp_bar(pg.sprite.Sprite):
     """
@@ -590,7 +590,8 @@ class Hp_bar(pg.sprite.Sprite):
         #self.image = pg.Surface((10, 20))
         ##self.rect = self.image.get_rect(topright=(1150, 10))
         #self.image.fill(RED)
-\
+
+
 
 def main():
     global MV_FIELD,MV_MOVE
@@ -606,6 +607,7 @@ def main():
     emys = pg.sprite.Group()
     ghosts = pg.sprite.Group()
     fields = pg.sprite.Group()
+    Death_Fields = pg.sprite.Group()
 
     Goal = pg.sprite.Group()
     Goal.add(Field(2500,0,20,HEIGHT))
@@ -615,13 +617,6 @@ def main():
         coins.add(Coin(random.randint(WIDTH, WIDTH*2), random.randint(50, HEIGHT*0.8)))  #スライドさせたときにも表示される
         coins.add(Coin(random.randint(WIDTH*2, WIDTH*3), random.randint(50, HEIGHT*0.8)))
         coins.add(Coin(random.randint(WIDTH*3, GOAL), random.randint(50, HEIGHT*0.8)))
-    fields.add(Field())
-    Death_fields = pg.sprite.Group()
-    Death_fields.add(Field(100,HEIGHT-50,50,50,(255,0,0)))
-    # fields.add(Field())
-    fields.add(Field(0,HEIGHT-20,1000,20))
-    fields.add(Field(1200,HEIGHT-20,200,20))
-    fields.add(Field(1000,HEIGHT/2))
     skill1_group = pg.sprite.Group()
 
     exp_bar = ExperienceBar()
@@ -675,18 +670,34 @@ def main():
 
         screen.blit(bg_img, [0, 0])        
 
-        if tmr % 500 == 0: #10秒に1回Fieldを出す
+        if tmr % 500 == 0: #5秒に1回Fieldを出す
             random_field = random.randint(0, 1)
+            random_field2 = random.randint(0, 1)
             if random_field == 0:
-                fields.add(Field(random.randint(WIDTH / 2, WIDTH),  #縦長のfieldを作成
-                                  random.randint(200, HEIGHT),
-                                  50,
-                                  random.randint(200, 500)))
+                if random_field2== 0:
+                    fields.add(Field(random.randint(WIDTH / 2, WIDTH),  #縦長のFieldを作成
+                                    random.randint(200, HEIGHT),
+                                    50,
+                                    random.randint(200, 500)))
+                else:
+                    Death_Fields.add(Field(random.randint(WIDTH / 2, WIDTH),  #縦長のDeath_Fieldを作成
+                                    random.randint(200, HEIGHT),
+                                    50,
+                                    random.randint(50, 100),
+                                    (255,0,0)))
             else:
-                fields.add(Field(random.randint(WIDTH / 2, WIDTH),   #横長のFieldを作成
-                                  random.randint(200, HEIGHT - 50),
-                                  random.randint(200, 500),
-                                  50))
+                if random_field2== 0:
+                    fields.add(Field(random.randint(WIDTH / 2, WIDTH),   #横長のFieldを作成
+                                    random.randint(200, HEIGHT - 50),
+                                    random.randint(200, 500),
+                                    50,))
+                else:
+                    Death_Fields.add(Field(random.randint(WIDTH / 2, WIDTH),   #横長のDeath_Fieldを作成
+                                    random.randint(200, HEIGHT - 50),
+                                    random.randint(50, 100),
+                                    50,
+                                    (255, 0, 0)))
+
 
         for ghost in ghosts:
              if ghost.state == "stop" and tmr%ghost.interval == 0:
@@ -706,7 +717,7 @@ def main():
             #pg.display.update()
             #time.sleep(2)
 
-        if pg.sprite.spritecollide(bird, Death_fields, True): # 即死オブジェクト判定
+        if pg.sprite.spritecollide(bird, Death_Fields, True): # 即死オブジェクト判定
             bird.change_img(8, screen) # こうかとん悲しみエフェクト
             score.update(screen)
             pg.display.update()
@@ -795,8 +806,8 @@ def main():
         funns.draw(screen)
         fields.update()
         fields.draw(screen)
-        Death_fields.update()
-        Death_fields.draw(screen)
+        Death_Fields.update()
+        Death_Fields.draw(screen)
         coins.update()
         coins.draw(screen)
         score.update(screen)
