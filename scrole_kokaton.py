@@ -595,7 +595,7 @@ class Hp_bar(pg.sprite.Sprite):
 
 def main():
     global MV_FIELD,MV_MOVE
-    pg.display.set_caption("真！こうかとん無双")
+    pg.display.set_caption("進め！こうかとん！")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load(f"{MAIN_DIR}/fig/pg_bg.jpg")
     score = Score()
